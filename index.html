@@ -1,119 +1,392 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>:3</title>
-    <style>
-      * {
-        user-select: none;
-      }
-      body,
-      html {
-        background-color: white;
-        height: 83%;
-      }
-      div.text {
-        height: 100%;
-        text-align: center;
-        /* display: flex; */
-        margin: 0;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-      }
-      h1 {
-        text-align: center;
-        color: #636363;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 40px;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        margin: 0;
-        align-items: center;
-        justify-content: center;
-      }
-      h4 {
-        text-align: center;
-        color: #636363;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 40px;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        margin: 0;
-        align-items: center;
-        justify-content: center;
-      }
-      h2 {
-        text-align: center;
-        color: #636363;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        margin: 0;
-        align-items: center;
-        justify-content: center;
-      }
-      p {
-        color: white;
-      }
-      .invincible {
-        opacity: 0%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="awal" class="text" onclick="toggleFullScreen(document.body)"><h1>Hi Salma <br/> <br/> click here</h1></div>
-    <script>
-      window.onload = function () {
-        document.getElementById("btn").click();
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>:3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        var scriptTag = document.createElement("script");
-        scriptTag.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js";
-        document.getElementsByTagName("head")[0].appendChild(scriptTag);
-      };
+    :root {
+      --pink: #ff6b9d;
+      --pink-light: #ffb3d0;
+      --pink-soft: #fff0f6;
+      --text: #4a4a4a;
+      --text-light: #8a8a8a;
+      --bg: #fff8fb;
+    }
 
-      function toggleFullScreen(elem) {
-        var element = document.getElementById("awal");
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+    }
 
-        element.innerHTML =
-          "<div style='margin-top: 85px'><img style='width: 100%' src='everknight.gif' alt='img.png' /></div>" +
-          "<div><h1>Maff yh tadi dicuekin pas lagi main</h1></div><br/>" +
-          "<div><h2>besok bakal diulang lagi</h2></div>" +
-          "<div><img src='nyan.gif' style='width: 42%' alt='nyan' /></div>";
-        // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
-        if (
-          (document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
-          (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
-          (document.mozFullScreen !== undefined && !document.mozFullScreen) ||
-          (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)
-        ) {
-          if (elem.requestFullScreen) {
-            elem.requestFullScreen();
-          } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-          } else if (elem.webkitRequestFullScreen) {
-            elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-          } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-          }
-        } else {
-          if (document.cancelFullScreen) {
-            document.cancelFullScreen();
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-          } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-          }
-        }
+    body {
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart-particle {
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0;
+      animation: floatUp 6s ease-in infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0.6; }
+      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+    }
+
+    .scene {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 80px;
+      gap: 20px;
+    }
+
+    .gif-wrap {
+      width: min(260px, 65vw);
+      height: min(200px, 50vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .gif-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 20px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 24px rgba(255, 107, 157, 0.25));
+    }
+
+    .text-card {
+      background: white;
+      border-radius: 28px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 40px rgba(255, 107, 157, 0.15), 0 2px 12px rgba(0,0,0,0.06);
+      width: min(380px, 88vw);
+      text-align: center;
+      position: relative;
+      transition: transform 0.15s ease;
+      border: 2px solid rgba(255, 107, 157, 0.1);
+    }
+
+    .text-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff6b9d33, #ffb3d022, #ff6b9d33);
+      z-index: -1;
+    }
+
+    .main-text {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.6rem, 7vw, 2.6rem);
+      color: var(--text);
+      line-height: 1.3;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: pre-line;
+    }
+
+    .main-text.pink {
+      color: var(--pink);
+      font-family: 'Nunito', cursive;
+      font-size: clamp(1.8rem, 7.5vw, 2.8rem);
+      text-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      70% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .pop {
+      animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 16px 20px 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--pink-light);
+      z-index: 10;
+      background: linear-gradient(to top, rgba(255,248,251,0.95) 60%, transparent);
+    }
+
+    .hint-dots {
+      display: inline-block;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .progress {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pink-light);
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      width: 22px;
+      border-radius: 4px;
+      background: var(--pink);
+    }
+
+    .dot.done {
+      background: rgba(255, 107, 157, 0.4);
+    }
+
+    .ripple {
+      position: fixed;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 107, 157, 0.2);
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleOut 0.6s ease-out forwards;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    @keyframes rippleOut {
+      to { transform: translate(-50%, -50%) scale(5); opacity: 0; }
+    }
+
+    .sparkle {
+      position: fixed;
+      font-size: 1.5rem;
+      animation: sparkleAnim 1s ease-out forwards;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    @keyframes sparkleAnim {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      100% { transform: translate(-50%, -200%) scale(1.5); opacity: 0; }
+    }
+
+    @keyframes slideOut {
+      to { transform: translateX(-60px); opacity: 0; }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(60px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<div class="scene" id="scene" onclick="handleClick(event)">
+
+  <!-- GIF placeholder -->
+  <div class="gif-wrap" id="gifWrap">
+    <img id="gifImg" src="gif1.gif" alt="" />
+  </div>
+
+  <!-- Text card -->
+  <div class="text-card" id="textCard">
+    <div class="main-text" id="mainText">Oi</div>
+  </div>
+
+  <!-- Progress dots -->
+  <div class="progress" id="progress"></div>
+
+</div>
+
+<div class="hint">
+  <span class="hint-dots">✦</span>
+  sentuh dimana saja untuk melanjutkan
+  <span class="hint-dots">✦</span>
+</div>
+
+<script>
+  const slides = [
+    { gif: "parrot.gif",   text: "Oi",                   pink: false },
+    { gif: "cat.gif",   text: "Udah buka\nbelum?",    pink: false },
+    { gif: "cat2.gif",   text: "Dengan ini",            pink: false },
+    { gif: "maaf.gif",   text: "Saya mohon\nmaaf",     pink: false },
+    { gif: "kuning.gif",   text: "Karena sudah",          pink: false },
+    { gif: "es.gif",   text: "Iming-iming",           pink: false },
+    { gif: "arab.gif",   text: "Saat anda\nberpuasa",  pink: false },
+    { gif: "plead.gif",   text: "Jadi maukah....",            pink: false },
+    // { gif: "gif9.gif",   text: "untuk memaafkan? 🥀",  pink: true  },
+    { gif: "baby.gif",   text: "gajadi minta maaf ah malu njir",  pink: false  },
+    { gif: "unblok.gif",   text: "tolong unblock yh",  pink: false  },
+  ];
+
+  let current = 0;
+  let isAnimating = false;
+  let fullscreenTriggered = false;
+
+  const mainText = document.getElementById('mainText');
+  const gifImg   = document.getElementById('gifImg');
+  const gifWrap  = document.getElementById('gifWrap');
+  const textCard = document.getElementById('textCard');
+  const progress = document.getElementById('progress');
+
+  function buildDots() {
+    progress.innerHTML = '';
+    slides.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
+      progress.appendChild(d);
+    });
+  }
+
+  function spawnHeart() {
+    const bg = document.getElementById('heartsBg');
+    const h = document.createElement('div');
+    h.className = 'heart-particle';
+    h.textContent = ['🥀','😂','🗿','✨','😜','🤓','☺️'][Math.floor(Math.random()*6)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.animationDelay = Math.random() * 4 + 's';
+    h.style.fontSize = (0.8 + Math.random() * 1) + 'rem';
+    bg.appendChild(h);
+    setTimeout(() => h.remove(), 7000);
+  }
+  setInterval(spawnHeart, 900);
+
+  function addRipple(x, y) {
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = x + 'px';
+    r.style.top  = y + 'px';
+    document.body.appendChild(r);
+    r.addEventListener('animationend', () => r.remove());
+  }
+
+  function burstSparkles(x, y) {
+    const emojis = ['🥀','😂','🗿','✨','😜','🤓','☺️'];
+    emojis.forEach((e, i) => {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = e;
+      s.style.left = (x + (Math.random()-0.5)*120) + 'px';
+      s.style.top  = (y + (Math.random()-0.5)*80) + 'px';
+      s.style.animationDelay = (i * 0.07) + 's';
+      document.body.appendChild(s);
+      s.addEventListener('animationend', () => s.remove());
+    });
+  }
+
+  function goFullscreen() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) req.call(el);
+  }
+
+  function setSlide(index) {
+    const slide = slides[index];
+
+    // Update text
+    mainText.classList.remove('pop', 'pink');
+    void mainText.offsetWidth; // reflow
+    mainText.textContent = slide.text;
+    mainText.classList.toggle('pink', !!slide.pink);
+    mainText.classList.add('pop');
+
+    // Update gif
+    gifWrap.style.opacity = '0';
+    gifWrap.style.transform = 'scale(0.85)';
+    setTimeout(() => {
+      gifImg.src = slide.gif + '?t=' + Date.now(); // force reload
+      gifWrap.style.opacity = '1';
+      gifWrap.style.transform = 'scale(1)';
+      gifWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+    }, 150);
+
+    buildDots();
+  }
+
+  function handleClick(e) {
+    if (isAnimating) return;
+
+    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth/2);
+    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight/2);
+
+    addRipple(x, y);
+
+    if (current === 0 && !fullscreenTriggered) {
+      fullscreenTriggered = true;
+      goFullscreen();
+    }
+
+    if (current < slides.length - 1) {
+      isAnimating = true;
+      current++;
+      setSlide(current);
+
+      if (current === slides.length - 1) {
+        setTimeout(() => burstSparkles(x, y), 200);
       }
-    </script>
-  </body>
+
+      setTimeout(() => { isAnimating = false; }, 500);
+    } else {
+      burstSparkles(x, y);
+    }
+  }
+
+  document.getElementById('scene').addEventListener('touchstart', function(e) {
+    handleClick(e.touches[0]);
+  }, { passive: true });
+
+  // Init
+  buildDots();
+  setSlide(0);
+</script>
+</body>
 </html>
-
