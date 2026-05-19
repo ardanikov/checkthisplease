@@ -40,6 +40,66 @@
       touch-action: manipulation;
     }
 
+    /* ── LOADER ────────────────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-emoji {
+      font-size: 3rem;
+      animation: loaderBounce 0.7s ease-in-out infinite alternate;
+    }
+
+    @keyframes loaderBounce {
+      from { transform: translateY(0) scale(1); }
+      to   { transform: translateY(-14px) scale(1.18); }
+    }
+
+    .loader-label {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--pink);
+      letter-spacing: 0.04em;
+    }
+
+    .loader-track {
+      width: min(220px, 60vw);
+      height: 9px;
+      background: var(--pink-light);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .loader-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--pink), #ff9ec4);
+      border-radius: 99px;
+      transition: width 0.35s ease;
+    }
+
+    .loader-count {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--pink-light);
+    }
+    /* ── END LOADER ─────────────────────────────────────────── */
+
     .hearts-bg {
       position: fixed;
       inset: 0;
@@ -56,8 +116,8 @@
     }
 
     @keyframes floatUp {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 0.6; }
-      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+      0%   { transform: translateY(100vh) rotate(0deg);  opacity: 0.6; }
+      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0;   }
     }
 
     .scene {
@@ -123,20 +183,17 @@
 
     .main-text.pink {
       color: var(--pink);
-      font-family: 'Nunito', cursive;
       font-size: clamp(1.8rem, 7.5vw, 2.8rem);
       text-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
     }
 
     @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      70% { transform: scale(1.08); opacity: 1; }
+      0%   { transform: scale(0.7); opacity: 0; }
+      70%  { transform: scale(1.08); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    .pop {
-      animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
+    .pop { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
     .hint {
       position: fixed;
@@ -161,7 +218,7 @@
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      50%       { opacity: 0.3; }
     }
 
     .progress {
@@ -184,9 +241,7 @@
       background: var(--pink);
     }
 
-    .dot.done {
-      background: rgba(255, 107, 157, 0.4);
-    }
+    .dot.done { background: rgba(255, 107, 157, 0.4); }
 
     .ripple {
       position: fixed;
@@ -213,38 +268,33 @@
     }
 
     @keyframes sparkleAnim {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
       100% { transform: translate(-50%, -200%) scale(1.5); opacity: 0; }
-    }
-
-    @keyframes slideOut {
-      to { transform: translateX(-60px); opacity: 0; }
-    }
-    @keyframes slideIn {
-      from { transform: translateX(60px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
     }
   </style>
 </head>
 <body>
 
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-emoji" id="loaderEmoji">🥀</div>
+  <div class="loader-label">Tunggu bentar lol</div>
+  <div class="loader-track">
+    <div class="loader-fill" id="loaderFill"></div>
+  </div>
+  <div class="loader-count" id="loaderCount">0 / 0</div>
+</div>
+
 <div class="hearts-bg" id="heartsBg"></div>
 
 <div class="scene" id="scene" onclick="handleClick(event)">
-
-  <!-- GIF placeholder -->
   <div class="gif-wrap" id="gifWrap">
-    <img id="gifImg" src="gif1.gif" alt="" />
+    <img id="gifImg" src="" alt="" />
   </div>
-
-  <!-- Text card -->
-  <div class="text-card" id="textCard">
+  <div class="text-card">
     <div class="main-text" id="mainText">Oi</div>
   </div>
-
-  <!-- Progress dots -->
   <div class="progress" id="progress"></div>
-
 </div>
 
 <div class="hint">
@@ -255,46 +305,88 @@
 
 <script>
   const slides = [
-    { gif: "parrot.gif",   text: "Oi",                   pink: false },
-    { gif: "cat.gif",   text: "Udah buka\nbelum?",    pink: false },
-    { gif: "cat2.gif",   text: "Dengan ini",            pink: false },
-    { gif: "maaf.gif",   text: "Saya mohon\nmaaf",     pink: false },
-    { gif: "kuning.gif",   text: "Karena sudah",          pink: false },
-    { gif: "es.gif",   text: "Iming-iming",           pink: false },
-    { gif: "arab.gif",   text: "Saat anda\nberpuasa",  pink: false },
-    { gif: "plead.gif",   text: "Jadi maukah....",            pink: false },
-    // { gif: "gif9.gif",   text: "untuk memaafkan? 🥀",  pink: true  },
-    { gif: "baby.gif",   text: "gajadi minta maaf ah malu njir",  pink: false  },
-    { gif: "unblok.gif",   text: "tolong unblock yh",  pink: false  },
+    { gif: "parrot.gif",  text: "Oi",                              pink: false },
+    { gif: "cat.gif",     text: "Udah buka\nbelum?",               pink: false },
+    { gif: "cat2.gif",    text: "Dengan ini",                      pink: false },
+    { gif: "maaf.gif",    text: "Saya mohon\nmaaf",                pink: false },
+    { gif: "kuning.gif",  text: "Karena sudah",                    pink: false },
+    { gif: "es.gif",      text: "Iming-iming",                     pink: false },
+    { gif: "arab.gif",    text: "Saat anda\nberpuasa",             pink: false },
+    { gif: "plead.gif",   text: "Jadi maukah....",                 pink: false },
+    { gif: "baby.gif",    text: "gajadi minta maaf ah malu njir",  pink: false },
+    { gif: "unblok.gif",  text: "tolong unblock yh",               pink: false },
   ];
 
-  let current = 0;
-  let isAnimating = false;
+  let current             = 0;
+  let isAnimating         = false;
   let fullscreenTriggered = false;
+  let ready               = false; // locked until preload finishes
 
-  const mainText = document.getElementById('mainText');
-  const gifImg   = document.getElementById('gifImg');
-  const gifWrap  = document.getElementById('gifWrap');
-  const textCard = document.getElementById('textCard');
-  const progress = document.getElementById('progress');
+  const mainText   = document.getElementById('mainText');
+  const gifImg     = document.getElementById('gifImg');
+  const gifWrap    = document.getElementById('gifWrap');
+  const progressEl = document.getElementById('progress');
+  const loader     = document.getElementById('loader');
+  const fillEl     = document.getElementById('loaderFill');
+  const countEl    = document.getElementById('loaderCount');
+  const emojiEl    = document.getElementById('loaderEmoji');
+
+  // ── PRELOADER ──────────────────────────────────────────────────────────────
+  (function preloadAll() {
+    const total  = slides.length;
+    let   loaded = 0;
+
+    countEl.textContent = '0 / ' + total;
+
+    const pool = ['🥀','😂','🗿','✨','😜','🤓','☺️'];
+    let ei = 0;
+    const emojiTimer = setInterval(() => {
+      emojiEl.textContent = pool[ei++ % pool.length];
+    }, 500);
+
+    function tick() {
+      loaded++;
+      const pct = Math.round((loaded / total) * 100);
+      fillEl.style.width      = pct + '%';
+      countEl.textContent     = loaded + ' / ' + total;
+
+      if (loaded === total) {
+        clearInterval(emojiTimer);
+        emojiEl.textContent = '✨';
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          ready = true;
+          setSlide(0); // first slide (images now cached)
+        }, 450);
+      }
+    }
+
+    slides.forEach(s => {
+      const img   = new Image();
+      img.onload  = tick;
+      img.onerror = tick;
+      img.src     = s.gif;
+    });
+  })();
+  // ── END PRELOADER ──────────────────────────────────────────────────────────
 
   function buildDots() {
-    progress.innerHTML = '';
+    progressEl.innerHTML = '';
     slides.forEach((_, i) => {
       const d = document.createElement('div');
       d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
-      progress.appendChild(d);
+      progressEl.appendChild(d);
     });
   }
 
   function spawnHeart() {
     const bg = document.getElementById('heartsBg');
-    const h = document.createElement('div');
-    h.className = 'heart-particle';
-    h.textContent = ['🥀','😂','🗿','✨','😜','🤓','☺️'][Math.floor(Math.random()*6)];
-    h.style.left = Math.random() * 100 + 'vw';
+    const h  = document.createElement('div');
+    h.className   = 'heart-particle';
+    h.textContent = ['🥀','😂','🗿','✨','😜','🤓','☺️'][Math.floor(Math.random()*7)];
+    h.style.left  = Math.random() * 100 + 'vw';
     h.style.animationDelay = Math.random() * 4 + 's';
-    h.style.fontSize = (0.8 + Math.random() * 1) + 'rem';
+    h.style.fontSize = (0.8 + Math.random()) + 'rem';
     bg.appendChild(h);
     setTimeout(() => h.remove(), 7000);
   }
@@ -310,13 +402,12 @@
   }
 
   function burstSparkles(x, y) {
-    const emojis = ['🥀','😂','🗿','✨','😜','🤓','☺️'];
-    emojis.forEach((e, i) => {
+    ['🥀','😂','🗿','✨','😜','🤓','☺️'].forEach((e, i) => {
       const s = document.createElement('div');
-      s.className = 'sparkle';
+      s.className   = 'sparkle';
       s.textContent = e;
-      s.style.left = (x + (Math.random()-0.5)*120) + 'px';
-      s.style.top  = (y + (Math.random()-0.5)*80) + 'px';
+      s.style.left  = (x + (Math.random()-0.5)*120) + 'px';
+      s.style.top   = (y + (Math.random()-0.5)*80)  + 'px';
       s.style.animationDelay = (i * 0.07) + 's';
       document.body.appendChild(s);
       s.addEventListener('animationend', () => s.remove());
@@ -324,39 +415,39 @@
   }
 
   function goFullscreen() {
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    const el  = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen
+              || el.mozRequestFullScreen || el.msRequestFullscreen;
     if (req) req.call(el);
   }
 
   function setSlide(index) {
     const slide = slides[index];
 
-    // Update text
     mainText.classList.remove('pop', 'pink');
-    void mainText.offsetWidth; // reflow
+    void mainText.offsetWidth; // force reflow so animation restarts
     mainText.textContent = slide.text;
     mainText.classList.toggle('pink', !!slide.pink);
     mainText.classList.add('pop');
 
-    // Update gif
-    gifWrap.style.opacity = '0';
-    gifWrap.style.transform = 'scale(0.85)';
+    gifWrap.style.transition = '';
+    gifWrap.style.opacity    = '0';
+    gifWrap.style.transform  = 'scale(0.85)';
     setTimeout(() => {
-      gifImg.src = slide.gif + '?t=' + Date.now(); // force reload
-      gifWrap.style.opacity = '1';
-      gifWrap.style.transform = 'scale(1)';
+      gifImg.src = slide.gif; // already cached — instant
       gifWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+      gifWrap.style.opacity    = '1';
+      gifWrap.style.transform  = 'scale(1)';
     }, 150);
 
     buildDots();
   }
 
   function handleClick(e) {
-    if (isAnimating) return;
+    if (!ready || isAnimating) return;
 
-    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth/2);
-    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight/2);
+    const x = e.clientX ?? e.touches?.[0]?.clientX ?? window.innerWidth  / 2;
+    const y = e.clientY ?? e.touches?.[0]?.clientY ?? window.innerHeight / 2;
 
     addRipple(x, y);
 
@@ -369,24 +460,16 @@
       isAnimating = true;
       current++;
       setSlide(current);
-
-      if (current === slides.length - 1) {
-        setTimeout(() => burstSparkles(x, y), 200);
-      }
-
+      if (current === slides.length - 1) setTimeout(() => burstSparkles(x, y), 200);
       setTimeout(() => { isAnimating = false; }, 500);
     } else {
       burstSparkles(x, y);
     }
   }
 
-  document.getElementById('scene').addEventListener('touchstart', function(e) {
+  document.getElementById('scene').addEventListener('touchstart', e => {
     handleClick(e.touches[0]);
   }, { passive: true });
-
-  // Init
-  buildDots();
-  setSlide(0);
 </script>
 </body>
 </html>
