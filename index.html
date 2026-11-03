@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>:3</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+  <title>🖤</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -15,92 +17,39 @@
     }
 
     :root {
-      --pink: #ff6b9d;
-      --pink-light: #ffb3d0;
-      --pink-soft: #fff0f6;
-      --text: #4a4a4a;
-      --text-light: #8a8a8a;
-      --bg: #fff8fb;
+      --bg: #000000;
+      --card-bg: rgba(18, 18, 20, 0.78);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f5f5f7;
+      --text-muted: #888890;
+      --accent: #ffffff;
+      --highlight: #e0e0e0;
     }
 
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 15%, rgba(40, 40, 55, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 50% 85%, rgba(20, 20, 25, 0.3) 0%, transparent 70%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       touch-action: manipulation;
+      position: relative;
     }
 
-    /* ── LOADER ────────────────────────────────────────────── */
-    #loader {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-
-    #loader.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .loader-emoji {
-      font-size: 3rem;
-      animation: loaderBounce 0.7s ease-in-out infinite alternate;
-    }
-
-    @keyframes loaderBounce {
-      from { transform: translateY(0) scale(1); }
-      to   { transform: translateY(-14px) scale(1.18); }
-    }
-
-    .loader-label {
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: var(--pink);
-      letter-spacing: 0.04em;
-    }
-
-    .loader-track {
-      width: min(220px, 60vw);
-      height: 9px;
-      background: var(--pink-light);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .loader-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--pink), #ff9ec4);
-      border-radius: 99px;
-      transition: width 0.35s ease;
-    }
-
-    .loader-count {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--pink-light);
-    }
-    /* ── END LOADER ─────────────────────────────────────────── */
-
-    .hearts-bg {
+    /* Ambient background stars & particles */
+    .stars-bg {
       position: fixed;
       inset: 0;
       pointer-events: none;
@@ -108,368 +57,378 @@
       z-index: 0;
     }
 
-    .heart-particle {
+    .star-particle {
       position: absolute;
-      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 1rem;
       opacity: 0;
-      animation: floatUp 6s ease-in infinite;
+      animation: floatUp 8s ease-in infinite;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
     }
 
     @keyframes floatUp {
-      0%   { transform: translateY(100vh) rotate(0deg);  opacity: 0.6; }
-      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0;   }
+      0%   { transform: translateY(105vh) scale(0.6) rotate(0deg); opacity: 0; }
+      15%  { opacity: 0.65; }
+      85%  { opacity: 0.65; }
+      100% { transform: translateY(-10vh) scale(1) rotate(45deg); opacity: 0; }
+    }
+
+    /* Top Moon element */
+    .moon-header {
+      position: absolute;
+      top: 6vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      opacity: 0.9;
+    }
+
+    .moon-icon {
+      font-size: 2.2rem;
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.45));
+      animation: moonGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes moonGlow {
+      from { transform: scale(1); filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.35)); }
+      to   { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.6)); }
     }
 
     .scene {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       width: 100%;
       height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 20px 80px;
-      gap: 20px;
-    }
-
-    .gif-wrap {
-      width: min(260px, 65vw);
-      height: min(200px, 50vw);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .gif-wrap img {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 20px;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 24px rgba(255, 107, 157, 0.25));
+      padding: 30px 24px 80px;
+      gap: 32px;
     }
 
     .text-card {
-      background: white;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border-radius: 28px;
-      padding: 28px 32px;
-      box-shadow: 0 8px 40px rgba(255, 107, 157, 0.15), 0 2px 12px rgba(0,0,0,0.06);
-      width: min(380px, 88vw);
+      padding: 42px 32px;
+      width: min(440px, 90vw);
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       position: relative;
-      transition: transform 0.15s ease;
-      border: 2px solid rgba(255, 107, 157, 0.1);
-    }
-
-    .text-card::before {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #ff6b9d33, #ffb3d022, #ff6b9d33);
-      z-index: -1;
+      border: 1px solid var(--card-border);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.85),
+        0 0 40px rgba(255, 255, 255, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .main-text {
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
-      font-size: clamp(1.6rem, 7vw, 2.6rem);
-      color: var(--text);
-      line-height: 1.3;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-weight: 700;
+      font-size: clamp(1.45rem, 5.8vw, 2.15rem);
+      color: var(--text-main);
+      line-height: 1.42;
+      letter-spacing: -0.015em;
       white-space: pre-line;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
-    .main-text.pink {
-      color: var(--pink);
-      font-size: clamp(1.8rem, 7.5vw, 2.8rem);
-      text-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+    .main-text.highlight {
+      color: #ffffff;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1.7rem, 6.6vw, 2.45rem);
+      letter-spacing: 0.01em;
+      text-shadow: 0 0 25px rgba(255, 255, 255, 0.45);
     }
 
     @keyframes popIn {
-      0%   { transform: scale(0.7); opacity: 0; }
-      70%  { transform: scale(1.08); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.96);
+      }
+      60% {
+        transform: translateY(-2px) scale(1.01);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    .pop { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .pop {
+      animation: popIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
+    /* Progress indicators */
+    .progress {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      justify-content: center;
+      max-width: 90vw;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      transition: all 0.35s ease;
+    }
+
+    .dot.active {
+      width: 22px;
+      border-radius: 99px;
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+    }
+
+    .dot.done {
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    /* Bottom Hint */
     .hint {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       text-align: center;
-      padding: 16px 20px 20px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      padding: 20px 20px 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--pink-light);
+      color: var(--text-muted);
       z-index: 10;
-      background: linear-gradient(to top, rgba(255,248,251,0.95) 60%, transparent);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 50%, transparent);
+      pointer-events: none;
     }
 
     .hint-dots {
       display: inline-block;
-      animation: blink 1.5s infinite;
+      margin: 0 4px;
+      animation: blink 2s infinite ease-in-out;
     }
 
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50%      { opacity: 0.25; transform: scale(0.85); }
     }
 
-    .progress {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--pink-light);
-      transition: all 0.3s ease;
-    }
-
-    .dot.active {
-      width: 22px;
-      border-radius: 4px;
-      background: var(--pink);
-    }
-
-    .dot.done { background: rgba(255, 107, 157, 0.4); }
-
+    /* Water Ripple Effect */
     .ripple {
       position: fixed;
       border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 107, 157, 0.2);
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 80%);
       transform: translate(-50%, -50%) scale(0);
-      animation: rippleOut 0.6s ease-out forwards;
+      animation: rippleOut 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
       pointer-events: none;
       z-index: 100;
     }
 
     @keyframes rippleOut {
-      to { transform: translate(-50%, -50%) scale(5); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(5.5); opacity: 0; }
     }
 
+    /* Sparkle burst at completion */
     .sparkle {
       position: fixed;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       animation: sparkleAnim 1s ease-out forwards;
       pointer-events: none;
       z-index: 200;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
     }
 
     @keyframes sparkleAnim {
-      0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-      100% { transform: translate(-50%, -200%) scale(1.5); opacity: 0; }
+      0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+      100% { transform: translate(-50%, -180%) scale(1.4) rotate(45deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-emoji" id="loaderEmoji">🥀</div>
-  <div class="loader-label">Tunggu bentar lol</div>
-  <div class="loader-track">
-    <div class="loader-fill" id="loaderFill"></div>
+  <!-- Ambient star particles container -->
+  <div class="stars-bg" id="starsBg"></div>
+
+  <!-- Top Moon Symbol (matches the reference screenshot) -->
+  <div class="moon-header">
+    <div class="moon-icon">🌕</div>
   </div>
-  <div class="loader-count" id="loaderCount">0 / 0</div>
-</div>
 
-<div class="hearts-bg" id="heartsBg"></div>
-
-<div class="scene" id="scene" onclick="handleClick(event)">
-  <div class="gif-wrap" id="gifWrap">
-    <img id="gifImg" src="" alt="" />
+  <div class="scene" id="scene">
+    <div class="text-card" id="card">
+      <div class="main-text" id="mainText">tan</div>
+    </div>
+    <div class="progress" id="progress"></div>
   </div>
-  <div class="text-card">
-    <div class="main-text" id="mainText">Oi</div>
+
+  <div class="hint">
+    <span class="hint-dots">✦</span>
+    sentuh dimana saja untuk melanjutkan
+    <span class="hint-dots">✦</span>
   </div>
-  <div class="progress" id="progress"></div>
-</div>
 
-<div class="hint">
-  <span class="hint-dots">✦</span>
-  sentuh dimana saja untuk melanjutkan
-  <span class="hint-dots">✦</span>
-</div>
+  <script>
+    const slides = [
+      { text: "Tan",                                           highlight: false },
+      { text: "will u be my girl ?",                           highlight: false  },
+      { text: "tapi aku gamau kamu jawab sekarang",             highlight: false },
+      { text: "aku pengen kita saling kenal dulu",             highlight: false },
+      { text: "tau kekurangan masing-masing",                  highlight: false },
+      { text: "untuk aku sendiri.....",                        highlight: false },
+      { text: "aku laki-laki yg masih berproses",              highlight: false },
+      { text: "kadang ada duitnya kadang ngga ada",            highlight: false },
+      { text: "aku juga lagi mengusahakan kehidupan yang lebih baik", highlight: false },
+      { text: "but i want you",                                highlight: false  },
+      { text: "to be part of my struggle for a better life",   highlight: false },
+      { text: "sambil jalan, mungkin kita bisa saling bantu",  highlight: false },
+      { text: "we'll rise above and beyond",                   highlight: false  },
+      { text: "what do you think ?",                           highlight: false  }
+    ];
 
-<script>
-  const slides = [
-    { gif: "parrot.gif",  text: "Oi",                              pink: false },
-    { gif: "cat.gif",     text: "Udah buka\nbelum?",               pink: false },
-    { gif: "cat2.gif",    text: "Dengan ini",                      pink: false },
-    { gif: "maaf.gif",    text: "Saya mohon\nmaaf",                pink: false },
-    { gif: "kuning.gif",  text: "Karena sudah",                    pink: false },
-    { gif: "es.gif",      text: "Iming-iming",                     pink: false },
-    { gif: "arab.gif",    text: "Saat anda\nberpuasa",             pink: false },
-    { gif: "plead.gif",   text: "Jadi maukah....",                 pink: false },
-    { gif: "baby.gif",    text: "gajadi minta maaf ah malu njir",  pink: false },
-    { gif: "unblok.gif",  text: "tolong unblock yh",               pink: false },
-  ];
+    let current             = 0;
+    let isAnimating         = false;
+    let fullscreenTriggered = false;
 
-  let current             = 0;
-  let isAnimating         = false;
-  let fullscreenTriggered = false;
-  let ready               = false; // locked until preload finishes
+    const mainText   = document.getElementById('mainText');
+    const textCard   = document.getElementById('card');
+    const progressEl = document.getElementById('progress');
+    const scene      = document.getElementById('scene');
 
-  const mainText   = document.getElementById('mainText');
-  const gifImg     = document.getElementById('gifImg');
-  const gifWrap    = document.getElementById('gifWrap');
-  const progressEl = document.getElementById('progress');
-  const loader     = document.getElementById('loader');
-  const fillEl     = document.getElementById('loaderFill');
-  const countEl    = document.getElementById('loaderCount');
-  const emojiEl    = document.getElementById('loaderEmoji');
+    function buildDots() {
+      progressEl.innerHTML = '';
+      slides.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
+        progressEl.appendChild(d);
+      });
+    }
 
-  // ── PRELOADER ──────────────────────────────────────────────────────────────
-  (function preloadAll() {
-    const total  = slides.length;
-    let   loaded = 0;
+    function spawnStar() {
+      const bg = document.getElementById('starsBg');
+      const star = document.createElement('div');
+      star.className = 'star-particle';
+      const symbols = ['✦', '✧', '⋆', '•', '✨', '🤍'];
+      star.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      star.style.left = (Math.random() * 96 + 2) + 'vw';
+      star.style.animationDuration = (6 + Math.random() * 4) + 's';
+      star.style.fontSize = (0.7 + Math.random() * 0.7) + 'rem';
+      bg.appendChild(star);
+      setTimeout(() => star.remove(), 10000);
+    }
 
-    countEl.textContent = '0 / ' + total;
+    // Spawn initial stars and continue periodically
+    for (let i = 0; i < 7; i++) {
+      setTimeout(spawnStar, i * 600);
+    }
+    setInterval(spawnStar, 1200);
 
-    const pool = ['🥀','😂','🗿','✨','😜','🤓','☺️'];
-    let ei = 0;
-    const emojiTimer = setInterval(() => {
-      emojiEl.textContent = pool[ei++ % pool.length];
-    }, 500);
+    function addRipple(x, y) {
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      r.style.left = x + 'px';
+      r.style.top  = y + 'px';
+      document.body.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    }
 
-    function tick() {
-      loaded++;
-      const pct = Math.round((loaded / total) * 100);
-      fillEl.style.width      = pct + '%';
-      countEl.textContent     = loaded + ' / ' + total;
-
-      if (loaded === total) {
-        clearInterval(emojiTimer);
-        emojiEl.textContent = '✨';
-        setTimeout(() => {
-          loader.classList.add('hidden');
-          ready = true;
-          setSlide(0); // first slide (images now cached)
-        }, 450);
+    function burstSparkles(x, y) {
+      const icons = ['✨', '🤍', '🌙', '✦', '✧', '⭐'];
+      for (let i = 0; i < 9; i++) {
+        const s = document.createElement('div');
+        s.className   = 'sparkle';
+        s.textContent = icons[Math.floor(Math.random() * icons.length)];
+        s.style.left  = (x + (Math.random() - 0.5) * 140) + 'px';
+        s.style.top   = (y + (Math.random() - 0.5) * 100) + 'px';
+        s.style.animationDelay = (i * 0.05) + 's';
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
       }
     }
 
-    slides.forEach(s => {
-      const img   = new Image();
-      img.onload  = tick;
-      img.onerror = tick;
-      img.src     = s.gif;
-    });
-  })();
-  // ── END PRELOADER ──────────────────────────────────────────────────────────
-
-  function buildDots() {
-    progressEl.innerHTML = '';
-    slides.forEach((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
-      progressEl.appendChild(d);
-    });
-  }
-
-  function spawnHeart() {
-    const bg = document.getElementById('heartsBg');
-    const h  = document.createElement('div');
-    h.className   = 'heart-particle';
-    h.textContent = ['🥀','😂','🗿','✨','😜','🤓','☺️'][Math.floor(Math.random()*7)];
-    h.style.left  = Math.random() * 100 + 'vw';
-    h.style.animationDelay = Math.random() * 4 + 's';
-    h.style.fontSize = (0.8 + Math.random()) + 'rem';
-    bg.appendChild(h);
-    setTimeout(() => h.remove(), 7000);
-  }
-  setInterval(spawnHeart, 900);
-
-  function addRipple(x, y) {
-    const r = document.createElement('div');
-    r.className = 'ripple';
-    r.style.left = x + 'px';
-    r.style.top  = y + 'px';
-    document.body.appendChild(r);
-    r.addEventListener('animationend', () => r.remove());
-  }
-
-  function burstSparkles(x, y) {
-    ['🥀','😂','🗿','✨','😜','🤓','☺️'].forEach((e, i) => {
-      const s = document.createElement('div');
-      s.className   = 'sparkle';
-      s.textContent = e;
-      s.style.left  = (x + (Math.random()-0.5)*120) + 'px';
-      s.style.top   = (y + (Math.random()-0.5)*80)  + 'px';
-      s.style.animationDelay = (i * 0.07) + 's';
-      document.body.appendChild(s);
-      s.addEventListener('animationend', () => s.remove());
-    });
-  }
-
-  function goFullscreen() {
-    const el  = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen
-              || el.mozRequestFullScreen || el.msRequestFullscreen;
-    if (req) req.call(el);
-  }
-
-  function setSlide(index) {
-    const slide = slides[index];
-
-    mainText.classList.remove('pop', 'pink');
-    void mainText.offsetWidth; // force reflow so animation restarts
-    mainText.textContent = slide.text;
-    mainText.classList.toggle('pink', !!slide.pink);
-    mainText.classList.add('pop');
-
-    gifWrap.style.transition = '';
-    gifWrap.style.opacity    = '0';
-    gifWrap.style.transform  = 'scale(0.85)';
-    setTimeout(() => {
-      gifImg.src = slide.gif; // already cached — instant
-      gifWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-      gifWrap.style.opacity    = '1';
-      gifWrap.style.transform  = 'scale(1)';
-    }, 150);
-
-    buildDots();
-  }
-
-  function handleClick(e) {
-    if (!ready || isAnimating) return;
-
-    const x = e.clientX ?? e.touches?.[0]?.clientX ?? window.innerWidth  / 2;
-    const y = e.clientY ?? e.touches?.[0]?.clientY ?? window.innerHeight / 2;
-
-    addRipple(x, y);
-
-    if (current === 0 && !fullscreenTriggered) {
-      fullscreenTriggered = true;
-      goFullscreen();
+    function goFullscreen() {
+      const el  = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen
+                || el.mozRequestFullScreen || el.msRequestFullscreen;
+      if (req) {
+        req.call(el).catch(() => {});
+      }
     }
 
-    if (current < slides.length - 1) {
-      isAnimating = true;
-      current++;
-      setSlide(current);
-      if (current === slides.length - 1) setTimeout(() => burstSparkles(x, y), 200);
-      setTimeout(() => { isAnimating = false; }, 500);
-    } else {
-      burstSparkles(x, y);
-    }
-  }
+    function setSlide(index) {
+      const slide = slides[index];
 
-  document.getElementById('scene').addEventListener('touchstart', e => {
-    handleClick(e.touches[0]);
-  }, { passive: true });
-</script>
+      mainText.classList.remove('pop', 'highlight');
+      void mainText.offsetWidth; // force reflow
+
+      mainText.textContent = slide.text;
+      if (slide.highlight) {
+        mainText.classList.add('highlight');
+      }
+      mainText.classList.add('pop');
+
+      textCard.style.transform = 'scale(0.97)';
+      setTimeout(() => {
+        textCard.style.transform = 'scale(1)';
+      }, 100);
+
+      buildDots();
+    }
+
+    let lastInteraction = 0;
+    function handleInteraction(clientX, clientY) {
+      const now = Date.now();
+      if (now - lastInteraction < 280 || isAnimating) return;
+      lastInteraction = now;
+
+      const x = clientX ?? window.innerWidth  / 2;
+      const y = clientY ?? window.innerHeight / 2;
+
+      addRipple(x, y);
+
+      if (current === 0 && !fullscreenTriggered) {
+        fullscreenTriggered = true;
+        goFullscreen();
+      }
+
+      if (current < slides.length - 1) {
+        isAnimating = true;
+        current++;
+        setSlide(current);
+        if (current === slides.length - 1) {
+          setTimeout(() => burstSparkles(x, y), 250);
+        }
+        setTimeout(() => { isAnimating = false; }, 350);
+      } else {
+        burstSparkles(x, y);
+      }
+    }
+
+    window.addEventListener('click', (e) => {
+      handleInteraction(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    // Initial setup
+    setSlide(0);
+  </script>
 </body>
 </html>
