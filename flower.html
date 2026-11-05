@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>For my beloved tanti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 30%, #fff5f8 0%, #fae8f0 50%, #f4dbe7 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      position: relative;
+    }
+
+    /* Ambient drifting & scattering petals canvas */
+    #petals-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ─── 1. HOLD-TO-UNLOCK SCREEN ─── */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+      cursor: pointer;
+    }
+
+    #lock-screen.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .hold-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244, 114, 182, 0.45) 0%, rgba(225, 29, 72, 0.08) 65%, transparent 100%);
+      animation: gentlePulse 2.4s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.4; }
+      50%      { transform: scale(1.15); opacity: 0.85; }
+    }
+
+    .progress-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      pointer-events: none;
+    }
+
+    .progress-bg-track {
+      fill: none;
+      stroke: rgba(225, 29, 72, 0.15);
+      stroke-width: 8;
+    }
+
+    .progress-bar-circle {
+      fill: none;
+      stroke: url(#roseGrad);
+      stroke-width: 9;
+      stroke-linecap: round;
+      stroke-dasharray: 502; /* 2 * PI * 80 */
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset 0.08s linear;
+      filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.5));
+    }
+
+    .hold-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffffff 0%, #fff0f5 55%, #fed7e2 100%);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        0 14px 35px rgba(225, 29, 72, 0.22),
+        inset 0 2px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -4px 10px rgba(225, 29, 72, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+      z-index: 2;
+    }
+
+    .hold-container.active .hold-circle {
+      transform: scale(0.93);
+      box-shadow: 
+        0 6px 20px rgba(225, 29, 72, 0.35),
+        inset 0 3px 8px rgba(225, 29, 72, 0.2);
+    }
+
+    .flower-emblem {
+      font-size: 2.8rem;
+      line-height: 1;
+      filter: drop-shadow(0 3px 6px rgba(225, 29, 72, 0.25));
+      transition: transform 0.3s ease;
+    }
+
+    .hold-container.active .flower-emblem {
+      transform: scale(1.18) rotate(16deg);
+    }
+
+    .hold-timer-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #be123c;
+      letter-spacing: 0.04em;
+    }
+
+    /* ─── 2. BOUQUET SHOWCASE (PURE ART & PETALS) ─── */
+    #bouquet-scene {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    #bouquet-scene.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .bouquet-display-wrap {
+      width: min(390px, 86vw);
+      height: min(490px, 75vh);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: floatBouquet 4s ease-in-out infinite alternate;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+
+    @keyframes floatBouquet {
+      0%   { transform: translateY(0px) rotate(0deg); }
+      50%  { transform: translateY(-12px) rotate(1.2deg); }
+      100% { transform: translateY(6px) rotate(-1.2deg); }
+    }
+
+    .bouquet-display-wrap svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 20px 35px rgba(180, 70, 110, 0.28));
+    }
+
+    /* Subtle indicator dots at the bottom */
+    .switch-indicator {
+      position: absolute;
+      bottom: 24px;
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(225, 29, 72, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      width: 24px;
+      border-radius: 99px;
+      background: #e11d48;
+      box-shadow: 0 0 10px rgba(225, 29, 72, 0.4);
+    }
+
+    /* Interactive click petals burst */
+    .burst-petal {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      animation: burstAnim 1.2s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+    }
+
+    @keyframes burstAnim {
+      0% {
+        transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.3) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen canvas for scattering & raining petals -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- ─── SCREEN 1: 3-SECOND HOLD BUTTON ─── -->
+  <div id="lock-screen">
+    <div class="hold-container" id="holdBtn">
+      <div class="pulse-ring"></div>
+
+      <svg class="progress-svg" viewBox="0 0 180 180">
+        <defs>
+          <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f472b6" />
+            <stop offset="50%" stop-color="#e11d48" />
+            <stop offset="100%" stop-color="#9f1239" />
+          </linearGradient>
+        </defs>
+        <circle class="progress-bg-track" cx="90" cy="90" r="80" />
+        <circle class="progress-bar-circle" id="progressBar" cx="90" cy="90" r="80" />
+      </svg>
+
+      <div class="hold-circle">
+        <div class="flower-emblem" id="flowerEmblem">🌸</div>
+        <span class="hold-timer-text" id="timerLabel">3.0s</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SCREEN 2: BOUQUET & SCATTERING PETALS ONLY ─── -->
+  <div id="bouquet-scene">
+    <div class="bouquet-display-wrap" id="bouquetWrap">
+      <!-- Injected Bouquet SVG -->
+    </div>
+    <div class="switch-indicator" id="switchIndicator"></div>
+  </div>
+
+  <script>
+    /* ─────────────────────────────────────────────────────────────
+       1. DATA BUKET BUNGA VECTOR ARTWORK (WARNA-WARNI & BERBAGAI MACAM)
+       ───────────────────────────────────────────────────────────── */
+    const BOUQUETS = [
+      {
+        id: 'romantic-rose',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fff1f5"/>
+                <stop offset="60%" stop-color="#fbcfe8"/>
+                <stop offset="100%" stop-color="#f472b6"/>
+              </linearGradient>
+              <linearGradient id="roseRed" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fb7185"/>
+                <stop offset="100%" stop-color="#e11d48"/>
+              </linearGradient>
+              <linearGradient id="roseDeep" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fda4af"/>
+                <stop offset="100%" stop-color="#be123c"/>
+              </linearGradient>
+              <linearGradient id="rosePink" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fdf2f8"/>
+                <stop offset="100%" stop-color="#fb7185"/>
+              </linearGradient>
+            </defs>
+            <!-- Wrapper Cone -->
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#pWrap)" stroke="#f472b6" stroke-width="2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#fbcfe8" opacity="0.95"/>
+            <!-- Stems & Foliage -->
+            <path d="M75 140 Q60 90 48 70" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+            <path d="M165 140 Q180 90 192 70" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="46" cy="70" rx="14" ry="7" fill="#22c55e" transform="rotate(-35 46 70)"/>
+            <ellipse cx="194" cy="70" rx="14" ry="7" fill="#22c55e" transform="rotate(35 194 70)"/>
+            <circle cx="70" cy="85" r="5" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.1))"/>
+            <circle cx="170" cy="82" r="5" fill="#ffffff"/>
+            <circle cx="120" cy="50" r="5" fill="#ffffff"/>
+            <!-- Peony Left -->
+            <g transform="translate(80, 115)">
+              <circle cx="0" cy="0" r="32" fill="url(#rosePink)"/>
+              <path d="M-20 -8 Q0 -28 20 -8 Q26 15 0 24 Q-26 15 -20 -8 Z" fill="#fda4af"/>
+              <circle cx="0" cy="0" r="14" fill="#f43f5e"/>
+            </g>
+            <!-- Rose Right -->
+            <g transform="translate(160, 118)">
+              <circle cx="0" cy="0" r="31" fill="url(#roseDeep)"/>
+              <path d="M-18 -8 Q0 -26 18 -8 Q24 14 0 22 Q-24 14 -18 -8 Z" fill="#f43f5e"/>
+              <circle cx="0" cy="0" r="12" fill="#9f1239"/>
+            </g>
+            <!-- Grand Center Rose -->
+            <g transform="translate(120, 92)">
+              <circle cx="0" cy="0" r="38" fill="url(#roseRed)"/>
+              <path d="M-24 -10 Q0 -34 24 -10 Q32 18 0 28 Q-32 18 -24 -10 Z" fill="#fb7185"/>
+              <circle cx="0" cy="0" r="18" fill="#e11d48"/>
+              <circle cx="0" cy="0" r="8" fill="#ffe4e6"/>
+            </g>
+            <!-- Satin Ribbon Bow -->
+            <g transform="translate(120, 175)">
+              <ellipse cx="-20" cy="-5" rx="18" ry="9" fill="#be123c" transform="rotate(-15 -20 -5)"/>
+              <ellipse cx="20" cy="-5" rx="18" ry="9" fill="#be123c" transform="rotate(15 20 -5)"/>
+              <circle cx="0" cy="-3" r="8" fill="#e11d48"/>
+              <path d="M-5 4 L-14 34 M5 4 L14 34" stroke="#be123c" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'sunflower-bouquet',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="kraftWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="50%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#b45309"/>
+              </linearGradient>
+            </defs>
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#kraftWrap)" stroke="#92400e" stroke-width="2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#d97706" opacity="0.9"/>
+            <!-- Greenery -->
+            <path d="M70 120 Q45 70 38 50" stroke="#15803d" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="38" cy="50" rx="18" ry="9" fill="#16a34a" transform="rotate(-40 38 50)"/>
+            <path d="M170 120 Q195 70 202 50" stroke="#15803d" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="202" cy="50" rx="18" ry="9" fill="#16a34a" transform="rotate(40 202 50)"/>
+            <!-- Left Sunflower -->
+            <g transform="translate(80, 116)">
+              ${Array.from({length: 12}).map((_, i) => `<ellipse cx="0" cy="-26" rx="7" ry="15" fill="#fbbf24" transform="rotate(${i * 30} 0 0)"/>`).join('')}
+              <circle cx="0" cy="0" r="18" fill="#78350f"/>
+              <circle cx="0" cy="0" r="13" fill="#451a03"/>
+            </g>
+            <!-- Right White Daisy -->
+            <g transform="translate(162, 118)">
+              ${Array.from({length: 12}).map((_, i) => `<ellipse cx="0" cy="-23" rx="7" ry="14" fill="#ffffff" stroke="#fef08a" stroke-width="1.2" transform="rotate(${i * 30} 0 0)"/>`).join('')}
+              <circle cx="0" cy="0" r="14" fill="#f59e0b"/>
+            </g>
+            <!-- Grand Top Center Sunflower -->
+            <g transform="translate(120, 84)">
+              ${Array.from({length: 16}).map((_, i) => `<ellipse cx="0" cy="-34" rx="9" ry="20" fill="#f59e0b" transform="rotate(${i * (360/16)} 0 0)"/>`).join('')}
+              ${Array.from({length: 16}).map((_, i) => `<ellipse cx="0" cy="-30" rx="7" ry="17" fill="#fde047" transform="rotate(${i * (360/16) + 11} 0 0)"/>`).join('')}
+              <circle cx="0" cy="0" r="23" fill="#78350f"/>
+              <circle cx="0" cy="0" r="16" fill="#451a03"/>
+            </g>
+            <!-- Twine Bow -->
+            <g transform="translate(120, 175)">
+              <circle cx="0" cy="-3" r="7" fill="#78350f"/>
+              <ellipse cx="-18" cy="-4" rx="16" ry="7" fill="#92400e" transform="rotate(-15 -18 -4)"/>
+              <ellipse cx="18" cy="-4" rx="16" ry="7" fill="#92400e" transform="rotate(15 18 -4)"/>
+              <path d="M-4 3 L-12 36 M4 3 L12 36" stroke="#78350f" stroke-width="4.5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'lavender-violet',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="lavWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#faf5ff"/>
+                <stop offset="60%" stop-color="#e9d5ff"/>
+                <stop offset="100%" stop-color="#c084fc"/>
+              </linearGradient>
+            </defs>
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#lavWrap)" stroke="#a855f7" stroke-width="2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#d8b4fe" opacity="0.9"/>
+            <!-- Stems -->
+            <path d="M90 140 L70 50" stroke="#22c55e" stroke-width="3"/>
+            <path d="M120 140 L120 38" stroke="#22c55e" stroke-width="3"/>
+            <path d="M150 140 L170 50" stroke="#22c55e" stroke-width="3"/>
+            <!-- Left Lavender Stalk -->
+            <g transform="translate(70, 50)">
+              ${[-22, -12, -2, 8, 18, 28, 38].map(y => `
+                <circle cx="-6" cy="${y}" r="5" fill="#a855f7"/>
+                <circle cx="6" cy="${y}" r="5" fill="#c084fc"/>
+              `).join('')}
+              <circle cx="0" cy="-30" r="4.5" fill="#e9d5ff"/>
+            </g>
+            <!-- Center Tall Lavender -->
+            <g transform="translate(120, 38)">
+              ${[-26, -16, -6, 4, 14, 24, 34, 44].map(y => `
+                <circle cx="-8" cy="${y}" r="6.5" fill="#7e22ce"/>
+                <circle cx="8" cy="${y}" r="6.5" fill="#a855f7"/>
+              `).join('')}
+              <circle cx="0" cy="-34" r="5" fill="#d8b4fe"/>
+            </g>
+            <!-- Right Lavender -->
+            <g transform="translate(170, 50)">
+              ${[-22, -12, -2, 8, 18, 28, 38].map(y => `
+                <circle cx="-6" cy="${y}" r="5" fill="#9333ea"/>
+                <circle cx="6" cy="${y}" r="5" fill="#c084fc"/>
+              `).join('')}
+              <circle cx="0" cy="-30" r="4.5" fill="#f3e8ff"/>
+            </g>
+            <!-- Front Blossom clusters -->
+            <circle cx="95" cy="125" r="22" fill="#a855f7"/>
+            <circle cx="95" cy="125" r="8" fill="#fef08a"/>
+            <circle cx="145" cy="122" r="22" fill="#7e22ce"/>
+            <circle cx="145" cy="122" r="8" fill="#fef08a"/>
+            <!-- Satin Purple Bow -->
+            <g transform="translate(120, 175)">
+              <ellipse cx="-20" cy="-5" rx="18" ry="9" fill="#6b21a8" transform="rotate(-15 -20 -5)"/>
+              <ellipse cx="20" cy="-5" rx="18" ry="9" fill="#6b21a8" transform="rotate(15 20 -5)"/>
+              <circle cx="0" cy="-3" r="8" fill="#9333ea"/>
+              <path d="M-5 4 L-12 34 M5 4 L12 34" stroke="#6b21a8" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'colorful-tulips',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="mintWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0fdfa"/>
+                <stop offset="60%" stop-color="#99f6e4"/>
+                <stop offset="100%" stop-color="#2dd4bf"/>
+              </linearGradient>
+            </defs>
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#mintWrap)" stroke="#0d9488" stroke-width="2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#5eead4" opacity="0.9"/>
+            <!-- Stems -->
+            <path d="M85 140 Q75 100 70 70" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+            <path d="M120 140 L120 60" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+            <path d="M155 140 Q165 100 170 70" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+            <!-- Left Tulip (Pink) -->
+            <g transform="translate(70, 85)">
+              <ellipse cx="0" cy="0" rx="18" ry="26" fill="#f43f5e"/>
+              <ellipse cx="-8" cy="2" rx="13" ry="24" fill="#fb7185"/>
+              <ellipse cx="8" cy="2" rx="13" ry="24" fill="#fda4af"/>
+            </g>
+            <!-- Right Tulip (Lilac) -->
+            <g transform="translate(170, 85)">
+              <ellipse cx="0" cy="0" rx="18" ry="26" fill="#a855f7"/>
+              <ellipse cx="-8" cy="2" rx="13" ry="24" fill="#c084fc"/>
+              <ellipse cx="8" cy="2" rx="13" ry="24" fill="#e9d5ff"/>
+            </g>
+            <!-- Top Yellow Tulip -->
+            <g transform="translate(120, 60)">
+              <ellipse cx="0" cy="0" rx="19" ry="28" fill="#eab308"/>
+              <ellipse cx="-9" cy="2" rx="14" ry="26" fill="#facc15"/>
+              <ellipse cx="9" cy="2" rx="14" ry="26" fill="#fef08a"/>
+            </g>
+            <!-- Front Coral Tulip -->
+            <g transform="translate(120, 116)">
+              <ellipse cx="0" cy="0" rx="20" ry="28" fill="#f97316"/>
+              <ellipse cx="-9" cy="2" rx="15" ry="26" fill="#fb923c"/>
+              <ellipse cx="9" cy="2" rx="15" ry="26" fill="#fed7aa"/>
+            </g>
+            <!-- Bow -->
+            <g transform="translate(120, 175)">
+              <ellipse cx="-18" cy="-5" rx="16" ry="8" fill="#0f766e" transform="rotate(-15 -18 -5)"/>
+              <ellipse cx="18" cy="-5" rx="16" ry="8" fill="#0f766e" transform="rotate(15 18 -5)"/>
+              <circle cx="0" cy="-3" r="8" fill="#14b8a6"/>
+              <path d="M-5 4 L-11 34 M5 4 L11 34" stroke="#0f766e" stroke-width="4.5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'velvet-red-roses',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="darkWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3f3f46"/>
+                <stop offset="100%" stop-color="#18181b"/>
+              </linearGradient>
+              <linearGradient id="goldRibbon" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fde047"/>
+                <stop offset="100%" stop-color="#ca8a04"/>
+              </linearGradient>
+            </defs>
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#darkWrap)" stroke="url(#goldRibbon)" stroke-width="2.2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#27272a" stroke="url(#goldRibbon)" stroke-width="1.2"/>
+            <ellipse cx="48" cy="75" rx="15" ry="8" fill="#14532d" transform="rotate(-30 48 75)"/>
+            <ellipse cx="192" cy="75" rx="15" ry="8" fill="#14532d" transform="rotate(30 192 75)"/>
+            <!-- Left Velvet Rose -->
+            <g transform="translate(80, 115)">
+              <circle cx="0" cy="0" r="32" fill="#881337"/>
+              <path d="M-18 -8 Q0 -28 18 -8 Q25 15 0 24 Q-25 15 -18 -8 Z" fill="#9f1239"/>
+              <circle cx="0" cy="0" r="13" fill="#e11d48"/>
+            </g>
+            <!-- Right Velvet Rose -->
+            <g transform="translate(160, 115)">
+              <circle cx="0" cy="0" r="32" fill="#881337"/>
+              <path d="M-18 -8 Q0 -28 18 -8 Q25 15 0 24 Q-25 15 -18 -8 Z" fill="#9f1239"/>
+              <circle cx="0" cy="0" r="13" fill="#e11d48"/>
+            </g>
+            <!-- Center Velvet Rose -->
+            <g transform="translate(120, 86)">
+              <circle cx="0" cy="0" r="38" fill="#4c0519"/>
+              <path d="M-22 -10 Q0 -32 22 -10 Q30 18 0 26 Q-30 18 -22 -10 Z" fill="#881337"/>
+              <circle cx="0" cy="0" r="18" fill="#be123c"/>
+              <circle cx="0" cy="0" r="8" fill="#fb7185"/>
+            </g>
+            <!-- Golden Bow -->
+            <g transform="translate(120, 175)">
+              <ellipse cx="-20" cy="-5" rx="18" ry="9" fill="url(#goldRibbon)" transform="rotate(-15 -20 -5)"/>
+              <ellipse cx="20" cy="-5" rx="18" ry="9" fill="url(#goldRibbon)" transform="rotate(15 20 -5)"/>
+              <circle cx="0" cy="-3" r="8" fill="#facc15"/>
+              <path d="M-5 4 L-12 34 M5 4 L12 34" stroke="#ca8a04" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 'white-lily-chamomile',
+        svg: `
+          <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="whiteWrap" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="60%" stop-color="#f1f5f9"/>
+                <stop offset="100%" stop-color="#cbd5e1"/>
+              </linearGradient>
+            </defs>
+            <path d="M65 160 L120 285 L175 160 Z" fill="url(#whiteWrap)" stroke="#94a3b8" stroke-width="2"/>
+            <path d="M50 148 Q120 180 190 148 L170 185 L70 185 Z" fill="#e2e8f0" opacity="0.95"/>
+            <ellipse cx="48" cy="65" rx="14" ry="7" fill="#22c55e" transform="rotate(-30 48 65)"/>
+            <ellipse cx="192" cy="65" rx="14" ry="7" fill="#22c55e" transform="rotate(30 192 65)"/>
+            <!-- Chamomile Left -->
+            <circle cx="78" cy="115" r="10" fill="#facc15"/>
+            ${Array.from({length: 8}).map((_, i) => `<ellipse cx="${78 + Math.cos(i*Math.PI/4)*18}" cy="${115 + Math.sin(i*Math.PI/4)*18}" rx="7" ry="5" fill="#ffffff" stroke="#f1f5f9"/>`).join('')}
+            <!-- Chamomile Right -->
+            <circle cx="162" cy="115" r="10" fill="#facc15"/>
+            ${Array.from({length: 8}).map((_, i) => `<ellipse cx="${162 + Math.cos(i*Math.PI/4)*18}" cy="${115 + Math.sin(i*Math.PI/4)*18}" rx="7" ry="5" fill="#ffffff" stroke="#f1f5f9"/>`).join('')}
+            <!-- Large White Lily -->
+            <g transform="translate(120, 84)">
+              ${[0, 60, 120, 180, 240, 300].map(deg => `
+                <path d="M0 0 Q-15 -35 0 -48 Q15 -35 0 0" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" transform="rotate(${deg} 0 0)"/>
+              `).join('')}
+              <circle cx="0" cy="0" r="11" fill="#fde047"/>
+              <circle cx="0" cy="0" r="6" fill="#ca8a04"/>
+            </g>
+            <!-- Emerald Ribbon -->
+            <g transform="translate(120, 175)">
+              <ellipse cx="-20" cy="-5" rx="18" ry="9" fill="#047857" transform="rotate(-15 -20 -5)"/>
+              <ellipse cx="20" cy="-5" rx="18" ry="9" fill="#047857" transform="rotate(15 20 -5)"/>
+              <circle cx="0" cy="-3" r="8" fill="#10b981"/>
+              <path d="M-5 4 L-12 34 M5 4 L12 34" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>
+        `
+      }
+    ];
+
+    /* ─────────────────────────────────────────────────────────────
+       2. HOLD 3 SECONDS UNLOCK
+       ───────────────────────────────────────────────────────────── */
+    const REQUIRED_HOLD_MS = 3000;
+    const CIRCUMFERENCE    = 2 * Math.PI * 80; // 502.65
+
+    let holdStartTime = null;
+    let holdAnimFrame = null;
+    let isHolding     = false;
+    let isUnlocked    = false;
+
+    const lockScreen      = document.getElementById('lock-screen');
+    const holdBtn         = document.getElementById('holdBtn');
+    const progressBar     = document.getElementById('progressBar');
+    const timerLabel      = document.getElementById('timerLabel');
+    const flowerEmblem    = document.getElementById('flowerEmblem');
+    const bouquetScene    = document.getElementById('bouquet-scene');
+    const bouquetWrap     = document.getElementById('bouquetWrap');
+    const switchIndicator = document.getElementById('switchIndicator');
+
+    let currentBouquetIndex = 0;
+
+    // Gentle Web Audio synthesiser
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playNote(freq, type = 'sine', duration = 0.5, volume = 0.15) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      const melody = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      melody.forEach((freq, idx) => {
+        setTimeout(() => playNote(freq, 'triangle', 0.8, 0.22), idx * 110);
+      });
+    }
+
+    function updateProgress(timestamp) {
+      if (!isHolding || isUnlocked) return;
+      if (!holdStartTime) holdStartTime = timestamp;
+
+      const elapsed = timestamp - holdStartTime;
+      const progress = Math.min(elapsed / REQUIRED_HOLD_MS, 1);
+
+      progressBar.style.strokeDashoffset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
+      timerLabel.textContent = Math.max(0, ((REQUIRED_HOLD_MS - elapsed) / 1000)).toFixed(1) + 's';
+
+      if (progress >= 1) {
+        completeUnlock();
+      } else {
+        holdAnimFrame = requestAnimationFrame(updateProgress);
+      }
+    }
+
+    function startHold(e) {
+      if (isUnlocked) return;
+      if (e) e.preventDefault();
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      isHolding = true;
+      holdStartTime = null;
+      holdBtn.classList.add('active');
+      flowerEmblem.textContent = '✨';
+
+      if (navigator.vibrate) navigator.vibrate(30);
+
+      cancelAnimationFrame(holdAnimFrame);
+      holdAnimFrame = requestAnimationFrame(updateProgress);
+    }
+
+    function cancelHold() {
+      if (!isHolding || isUnlocked) return;
+
+      isHolding = false;
+      holdBtn.classList.remove('active');
+      cancelAnimationFrame(holdAnimFrame);
+      holdStartTime = null;
+
+      progressBar.style.transition = 'stroke-dashoffset 0.3s ease-out';
+      progressBar.style.strokeDashoffset = CIRCUMFERENCE;
+      timerLabel.textContent = '3.0s';
+      flowerEmblem.textContent = '🌸';
+
+      setTimeout(() => {
+        progressBar.style.transition = 'none';
+      }, 300);
+    }
+
+    function completeUnlock() {
+      isUnlocked = true;
+      isHolding  = false;
+      cancelAnimationFrame(holdAnimFrame);
+
+      if (navigator.vibrate) navigator.vibrate([70, 40, 110]);
+      playChime();
+
+      // Burst of petals from center
+      const rect = holdBtn.getBoundingClientRect();
+      burstPetals(rect.left + rect.width / 2, rect.top + rect.height / 2, 45);
+
+      // Hide lock screen
+      lockScreen.classList.add('unlocked');
+
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+        showBouquetScene();
+        rainLushPetals(35);
+      }, 600);
+    }
+
+    holdBtn.addEventListener('mousedown', startHold);
+    window.addEventListener('mouseup', cancelHold);
+    holdBtn.addEventListener('mouseleave', cancelHold);
+
+    holdBtn.addEventListener('touchstart', startHold, { passive: false });
+    window.addEventListener('touchend', cancelHold);
+    window.addEventListener('touchcancel', cancelHold);
+
+    /* ─────────────────────────────────────────────────────────────
+       3. BOUQUET PRESENTATION & TAP TO SWITCH
+       ───────────────────────────────────────────────────────────── */
+    function buildDots() {
+      switchIndicator.innerHTML = '';
+      BOUQUETS.forEach((_, idx) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (idx === currentBouquetIndex ? ' active' : '');
+        switchIndicator.appendChild(d);
+      });
+    }
+
+    function displayBouquet(index) {
+      currentBouquetIndex = index;
+      bouquetWrap.style.opacity = '0';
+      bouquetWrap.style.transform = 'scale(0.88)';
+
+      setTimeout(() => {
+        bouquetWrap.innerHTML = BOUQUETS[currentBouquetIndex].svg;
+        bouquetWrap.style.opacity = '1';
+        bouquetWrap.style.transform = 'scale(1)';
+        buildDots();
+      }, 200);
+    }
+
+    function showBouquetScene() {
+      bouquetScene.classList.add('visible');
+      displayBouquet(0);
+    }
+
+    // Tap anywhere on scene to switch bouquet and scatter petals
+    bouquetScene.addEventListener('click', (e) => {
+      const nextIndex = (currentBouquetIndex + 1) % BOUQUETS.length;
+      displayBouquet(nextIndex);
+      burstPetals(e.clientX, e.clientY, 25);
+      rainLushPetals(15);
+      playNote(659.25, 'triangle', 0.4, 0.15);
+    });
+
+    /* ─────────────────────────────────────────────────────────────
+       4. SCATTERING PETALS & BURST ANIMATIONS
+       ───────────────────────────────────────────────────────────── */
+    const ICONS = ['🌸', '🌺', '🌷', '🌹', '🌻', '🌼', '✨', '🤍', '🍃'];
+
+    function burstPetals(x, y, count = 30) {
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'burst-petal';
+        p.textContent = ICONS[Math.floor(Math.random() * ICONS.length)];
+
+        const angle = Math.random() * 2 * Math.PI;
+        const dist = 60 + Math.random() * 240;
+        const dx = Math.cos(angle) * dist + 'px';
+        const dy = Math.sin(angle) * dist + 'px';
+        const rot = (Math.random() * 360 - 180) + 'deg';
+
+        p.style.setProperty('--dx', dx);
+        p.style.setProperty('--dy', dy);
+        p.style.setProperty('--rot', rot);
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1200);
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       5. CONTINUOUS SCATTERING & RAINING PETALS CANVAS ENGINE
+       ───────────────────────────────────────────────────────────── */
+    const canvas = document.getElementById('petals-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const PETAL_COLORS = [
+      'rgba(244, 114, 182, 0.85)', // rose pink
+      'rgba(251, 113, 133, 0.85)', // crimson pink
+      'rgba(253, 224, 71, 0.85)',  // sunflower yellow
+      'rgba(192, 132, 252, 0.8)',  // lavender
+      'rgba(255, 255, 255, 0.9)',  // daisy white
+      'rgba(251, 146, 60, 0.85)',  // tulip peach
+      'rgba(190, 18, 60, 0.85)'    // velvet red
+    ];
+
+    class Petal {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        this.x = Math.random() * width;
+        this.y = init ? Math.random() * height : -25;
+        this.size = 9 + Math.random() * 14;
+        this.speedY = 1.2 + Math.random() * 2.5;
+        this.speedX = (Math.random() - 0.5) * 1.8;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.05;
+        this.color = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)];
+        this.flip = Math.random();
+        this.flipSpeed = 0.02 + Math.random() * 0.035;
+      }
+
+      update() {
+        this.y += this.speedY;
+        this.x += Math.sin(this.y * 0.012) * 1.6 + this.speedX;
+        this.rotation += this.rotSpeed;
+        this.flip += this.flipSpeed;
+
+        if (this.y > height + 30) {
+          this.reset(false);
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.scale(1, Math.sin(this.flip));
+
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.moveTo(0, -this.size);
+        ctx.bezierCurveTo(this.size * 0.85, -this.size * 0.5, this.size * 0.75, this.size * 0.75, 0, this.size);
+        ctx.bezierCurveTo(-this.size * 0.75, this.size * 0.75, -this.size * 0.85, -this.size * 0.5, 0, -this.size);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    const petals = Array.from({ length: 50 }, () => new Petal());
+
+    function animatePetals() {
+      ctx.clearRect(0, 0, width, height);
+      petals.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animatePetals);
+    }
+    animatePetals();
+
+    function rainLushPetals(count = 25) {
+      for (let i = 0; i < count; i++) {
+        const p = new Petal();
+        p.y = -Math.random() * 80;
+        petals.push(p);
+      }
+      setTimeout(() => {
+        if (petals.length > 50) petals.splice(50, count);
+      }, 6000);
+    }
+  </script>
+</body>
+</html>
